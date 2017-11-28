@@ -10,6 +10,21 @@ language models.
 See available languages [here](https://github.com/tensorflow/models/blob/master/research/syntaxnet/g3doc/universal.md).
 
 ```bash
+echo "There's just so much to discover and I don't know where to start." | ./parse.sh English
+1 There's _ ADV RB  fPOS=PRON++PRP  4 advmod  _ _
+2 just  _ ADV RB  fPOS=ADV++RB  4 advmod  _ _
+3 so  _ ADV RB  fPOS=ADV++RB  4 advmod  _ _
+4 much  _ ADJ JJ  Degree=Pos|fPOS=ADJ++JJ 0 ROOT  _ _
+5 to  _ PART  TO  fPOS=PART++TO 6 mark  _ _
+6 discover  _ VERB  VB  VerbForm=Inf|fPOS=VERB++VB  4 advcl _ _
+7 and _ CONJ  CC  fPOS=CONJ++CC 4 cc  _ _
+8 I _ PRON  PRP Case=Nom|Number=Sing|Person=1|PronType=Prs|fPOS=PRON++PRP 10  nsubj _ _
+9 don't _ PART  RB  Mood=Ind|Tense=Pres|VerbForm=Fin|fPOS=AUX++VBP  10  advmod  _ _
+10  know  _ VERB  VB  VerbForm=Inf|fPOS=VERB++VB  4 conj  _ _
+11  where _ ADV WRB PronType=Int|fPOS=ADV++WRB  13  advmod  _ _
+12  to  _ PART  TO  fPOS=PART++TO 13  mark  _ _
+13  start.  _ VERB  VB  VerbForm=Inf|fPOS=VERB++VB  10  advcl _ _
+
 echo "Le chat dont je me suis séparé a beaucoup grandi." | ./parse.sh French
 1 Le  _ DET _ Definite=Def|Gender=Masc|Number=Sing|fPOS=DET++ 2 det _ _
 2 chat  _ NOUN  _ Gender=Masc|Number=Sing|fPOS=NOUN++ 0 ROOT  _ _
