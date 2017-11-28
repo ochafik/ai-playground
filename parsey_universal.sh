@@ -13,7 +13,7 @@ if [[ ! -d "models/parsey_universal/$language" ]]; then
   )
 fi
 
-docker run --rm -i --entrypoint=/data/entrypoint.sh \
+docker run --rm -i --entrypoint=/data/docker_entrypoints/parsey_universal.sh \
   -e "language=$language" \
   -v "$PWD:/data" \
   tensorflow/syntaxnet 
