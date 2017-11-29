@@ -13,15 +13,14 @@ RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
   wget https://github.com/bazelbuild/bazel/archive/$BAZEL_VERSION.zip && \
-  unzip $BAZEL_VERSION.zip && \
+  unzip $BAZEL_VERSION.zip 2>/dev/null && \
   rm $BAZEL_VERSION.zip && \
   cd bazel-$BAZEL_VERSION && \
   sed -i 's/-Isrc/-I. -Ithird_party\/googleapis -Isrc/' scripts/bootstrap/compile.sh && \
   sed -Ei 's/-classpath/-J-Xmx800M \0/' scripts/bootstrap/compile.sh && \
-  sed -i 's/option php_namespace.*$//' third_party/googleapis/google/longrunning/operations.proto && \
   cp \
-    third_party/pprof/profile.proto \
-    third_party/googleapis/google/devtools/remoteexecution/v1test/remote_execution.proto \
+    third_party/pprof/*.proto \
+    third_party/googleapis/google/devtools/remoteexecution/v1test/*.proto \
     third_party/googleapis/google/devtools/build/v1/*.proto \
     third_party/googleapis/google/api/*.proto \
     third_party/googleapis/google/api/experimental/*.proto \
