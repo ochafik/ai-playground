@@ -49,7 +49,7 @@ RUN apt-get update && \
   bash ./compile.sh
 
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
-FROM resin/rpi-raspbian
+FROM resin/rpi-raspbian:stretch
 WORKDIR /root/
 COPY --from=bazel-builder \
   /usr/local/bin/protoc \
