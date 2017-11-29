@@ -18,6 +18,7 @@ RUN apt-get update && \
   cd bazel-$BAZEL_VERSION && \
   sed -i 's/-Isrc/-I. -Ithird_party\/googleapis -Isrc/' scripts/bootstrap/compile.sh && \
   sed -Ei 's/-classpath/-J-Xmx800M \0/' scripts/bootstrap/compile.sh && \
+  sed -Ei 's/atexit cleanup_tempdir_/ln -s "\$\{DIR\}\/src derived #\0/' scripts/bootstrap/buildenv.sh && \
   cp \
     third_party/pprof/*.proto \
     third_party/googleapis/google/devtools/remoteexecution/v1test/*.proto \
