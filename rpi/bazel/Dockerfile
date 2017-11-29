@@ -4,7 +4,7 @@
 #   docker run --rm --privileged multiarch/qemu-user-static:register --reset
 #   docker build -t rpi-raspbian-bazel .
 # 
-FROM resin/rpi-raspbian
+FROM resin/rpi-raspbian as bazel-builder
 RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
@@ -48,7 +48,7 @@ RUN apt-get update && \
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
 FROM resin/rpi-raspbian
 WORKDIR /root/
-COPY --from=0 \
+COPY --from=bazel-builder \
   /usr/local/bin/protoc \
   /bazel-src/bazel-bin/blaze \
   /bazel-src/third_party/grpc/compiler/src/java_plugin/cpp/protoc-gen-grpc-java \
