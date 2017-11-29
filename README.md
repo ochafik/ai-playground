@@ -43,7 +43,7 @@ language models.
 See available languages [here](https://github.com/tensorflow/models/blob/master/research/syntaxnet/g3doc/universal.md).
 
 ```bash
-# Assumes you have docker installed.
+# Assumes you have docker installed, see below
 
 echo "There's just so much to discover and I don't know where to start." | ./parsey_universal.sh English
 1 There's _ ADV RB  fPOS=PRON++PRP  4 advmod  _ _
@@ -94,3 +94,104 @@ docker run --rm -ti -p 8888:8888 --entrypoint=/bin/bash \
 bazel build -c opt syntaxnet:parser_eval
 echo "This is a test" | syntaxnet/models/parsey_universal/parsey_universal.sh /data/models/parsey_universal/English
 ```
+
+# Tensorflow, Docker & Raspberry Pi
+
+- [Complete Tensorflow on RPi from scratch](https://github.com/ochafik/tensorflow-on-raspberry-pi)
+  ([bazel](https://github.com/samjabrahams/tensorflow-on-raspberry-pi/blob/master/GUIDE.md#3-build-bazel))
+- [Build Docker images for ARM](https://blog.hypriot.com/post/setup-simple-ci-pipeline-for-arm-images/)
+- [Tensorflow Dockerfile](https://github.com/tensorflow/models/blob/master/research/syntaxnet/docker-devel/Dockerfile.min)
+
+- [Install docker on Raspbian](https://howchoo.com/g/nmrlzmq1ymn/how-to-install-docker-on-your-raspberry-pi)
+
+# Bazel on Raspberry Pi (Raspbian)
+
+```bash
+# https://docs.bazel.build/versions/master/install-compile-source.html
+# sudo apt-get install build-essential openjdk-8-jdk python zip
+
+export BAZEL_VERSION=0.8.0
+export GRPC_VERSION=1.6.1
+export GRPC_BRANCH=v1.6.x
+
+sudo apt-get install protobuf-compiler libprotobuf-dev libprotobuf-java libprotoc-dev
+
+# Download Bazel sources
+wget https://github.com/bazelbuild/bazel/archive/$BAZEL_VERSION.zip
+unzip $BAZEL_VERSION
+rm $BAZEL_VERSION
+pushd bazel-$BAZEL_VERSION
+
+# Adjust some sources
+
+# Filed https://github.com/bazelbuild/bazel/pull/4187
+sed -i 's/-Isrc/-I. -Isrc/' scripts/bootstrap/compile.sh
+ln -s ../googleapis/google
+
+# TODO(ochafik): File this (from https://github.com/samjabrahams/tensorflow-on-raspberry-pi/blob/master/GUIDE.md#3-build-bazel)
+sed -Ei 's/-classpath/-J-Xmx800M \0/' scripts/bootstrap/compile.sh
+
+# Raspbian ships with protoc 3.0.0 but this option was introduced in 3.4.x
+# (see https://github.com/grpc/grpc/pull/11886)
+sed -i 's/option php_namespace.*$//' third_party/googleapis/google/longrunning/operations.proto
+
+# TODO(ochafik): Send PR with https://github.com/bazelbuild/bazel/compare/master...ochafik:patch-2
+cp \
+  third_party/pprof/profile.proto \
+  third_party/googleapis/google/devtools/remoteexecution/v1test/remote_execution.proto \
+  third_party/googleapis/google/devtools/build/v1/*.proto \
+  third_party/googleapis/google/api/*.proto \
+  third_party/googleapis/google/rpc/*.proto \
+  third_party/googleapis/google/longrunning/*.proto \
+  third_party/googleapis/google/bytestream/*.proto \
+  third_party/googleapis/google/watcher/v1/*.proto \
+  src/main/protobuf
+
+# Build GRPC_JAVA_PLUGIN
+pushd third_party/grpc/compiler/src/java_plugin/cpp
+  gcc -w -I/usr/include -lprotoc java_generator.cpp java_plugin.cpp -o protoc-gen-grpc-java
+  export GRPC_JAVA_PLUGIN="$PWD/protoc-gen-grpc-java"
+popd
+
+export PROTOC=`which protoc`
+bash ./compile.sh
+popd
+
+
+
+# TODO(ochafik):
+# - Cleanup Maven cache
+# - Try https://github.com/bazelbuild/bazel/blob/master/third_party/grpc/README.bazel.md
+
+# Build protoc-gen-grpc-java
+(
+  git clone -b "$GRPC_BRANCH" https://github.com/grpc/grpc-java.git --depth=1
+  cd grpc-java/compiler
+
+  sed -Ei 's/"(aarch_64|ppcle_64)"/"linux_arm-v7"/g' build.gradle
+  export CPPFLAGS=-I/usr/include
+  ../gradlew java_pluginExecutable
+  sudo cp build/exe/java_plugin/protoc-gen-grpc-java /usr/bin/protoc-gen-grpc-java-$GRPC_VERSION
+  sudo ln -s /usr/bin/protoc-gen-grpc-java-$GRPC_VERSION /usr/bin/protoc-gen-grpc-java
+  echo "Can reclaim space with: rm -fR $PWD/grpc-java"
+)
+export GRPC_JAVA_PLUGIN=`which protoc-gen-grpc-java`
+
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+    -Dartifact=io.grpc:grpc-protobuf:$GRPC_VERSION
+  # mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+  #   -Dartifact=io.grpc:grpc-stub:$GRPC_VERSION
+sed -i "s/-Isrc/-I$(echo $PWD/../googleapis | sed 's/\//\\\//g') -Isrc/" scripts/bootstrap/compile.sh
+
+
+
+WARNING: /tmp/bazel_k4wE9AzC/out/external/bazel_tools/WORKSPACE:1: Workspace name in /tmp/bazel_k4wE9AzC/out/external/bazel_tools/WORKSPACE (@io_bazel) does not match the name given in the repository's definition (@bazel_tools); this will cause a build error in future versions
+ERROR: /home/pi/bazel-0.8.0/src/java_tools/buildjar/java/com/google/devtools/build/buildjar/BUILD:144:12: in srcs attribute of bootstrap_java_library rule //src/java_tools/buildjar/java/com/google/devtools/build/buildjar:skylark-deps: '//:bootstrap-derived-java-srcs' does not produce any bootstrap_java_library srcs files (expected .java)
+ERROR: Analysis of target '//src:bazel' failed; build aborted: Analysis of target '//src/java_tools/buildjar/java/com/google/devtools/build/buildjar:skylark-deps' failed; build aborted
+INFO: Elapsed time: 19.893s
+FAILED: Build did NOT complete successfully (60 packages loaded)
+
+  
+```
+
+
