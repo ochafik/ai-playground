@@ -2,20 +2,15 @@
 # Builds Bazel from scratch (incl. protoc & protoc-gen-grpc-java deps).
 # 
 FROM resin/rpi-raspbian
-# docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
-#oracle-java8-jdk openjdk-8-jdk 
-# sed -i 's/jessie/stretch/g' /etc/apt/sources.list && \
-#   apt-get update && \
-#   apt-get upgrade && \
-#   apt-get dist-upgrade && \
 RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
   wget https://github.com/bazelbuild/bazel/archive/$BAZEL_VERSION.zip && \
   unzip $BAZEL_VERSION.zip >/dev/null && \
   rm $BAZEL_VERSION.zip && \
-  cd bazel-$BAZEL_VERSION && \
+  mv bazel-$BAZEL_VERSION bazel-src && \
+  cd bazel-src && \
   sed -i 's/-Isrc/-I. -Ithird_party\/googleapis -Isrc/' scripts/bootstrap/compile.sh && \
   sed -Ei 's/-classpath/-J-Xmx800M \0/' scripts/bootstrap/compile.sh && \
   sed -Ei 's/atexit cleanup_tempdir_/ln -s "\$\{DIR\}\/src derived #\0/' scripts/bootstrap/buildenv.sh && \
@@ -54,8 +49,6 @@ RUN apt-get update && \
 # ERROR: Analysis of target '//src:bazel' failed; build aborted: Analysis of target '//src/java_tools/buildjar/java/com/google/devtools/build/buildjar:skylark-deps' failed; build aborted
 # INFO: Elapsed time: 19.893s
 # FAILED: Build did NOT complete successfully (60 packages loaded)
-
-
 
 #   apt-get install protobuf-compiler libprotobuf-dev libprotobuf-java libprotoc-dev && \
 #   export GRPC_VERSION=1.6.1 && \
