@@ -1,0 +1,27 @@
+ENV origin resin/rpi-raspbian:stretch
+
+FROM ${origin} as bazel-builder
+RUN apt-get update && \
+  apt-get install -y build-essential git java8 autoconf automake libtool make g++ &&
+  git clone -b raspbian-from-scratch https://github.com/ochafik/bazel.git --depth=1 && \
+  cd bazel && \
+  pushd third_party/protobuf/3.4.0 && \
+    ./autogen.sh && ./configure && make && make install && ldconfig && \
+  popd && \
+  export PROTOC=`which protoc` && \
+  pushd third_party/grpc/compiler/src/java_plugin/cpp && \
+    g++ -w -I/usr/local/include -export-dynamic \
+      java_generator.cpp java_plugin.cpp \
+      -o protoc-gen-grpc-java \
+      -L/usr/local/lib -lprotobuf -lprotoc && \
+    export GRPC_JAVA_PLUGIN="$PWD/protoc-gen-grpc-java" && \
+  popd && \
+  bash ./compile.sh
+
+# https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
+FROM ${origin}
+COPY --from=bazel-builder \
+  /usr/local/bin/protoc \
+  /bazel-src/bazel-bin/blaze \
+  /bazel-src/third_party/grpc/compiler/src/java_plugin/cpp/protoc-gen-grpc-java \
+  /usr/bin
