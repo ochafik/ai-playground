@@ -8,6 +8,7 @@
 # TODO: build custom image from https://hub.docker.com/r/arm32v7/debian/ as done in https://github.com/resin-io-library/base-images/tree/master/debian/armv7hf/stretch
 # 
 FROM resin/rpi-raspbian:stretch as bazel-builder
+RUN echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:' > /proc/sys/fs/binfmt_misc/register
 RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
