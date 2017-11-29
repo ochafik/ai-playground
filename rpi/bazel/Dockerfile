@@ -13,7 +13,7 @@ RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
   wget https://github.com/bazelbuild/bazel/archive/$BAZEL_VERSION.zip && \
-  unzip $BAZEL_VERSION.zip 2>/dev/null && \
+  unzip $BAZEL_VERSION.zip >/dev/null && \
   rm $BAZEL_VERSION.zip && \
   cd bazel-$BAZEL_VERSION && \
   sed -i 's/-Isrc/-I. -Ithird_party\/googleapis -Isrc/' scripts/bootstrap/compile.sh && \
