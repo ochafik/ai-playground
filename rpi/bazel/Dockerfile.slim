@@ -1,7 +1,8 @@
-FROM resin/rpi-raspbian:stretch as bazel-builder
+#FROM resin/rpi-raspbian:stretch as bazel-builder
+
 FROM ubuntu as bazel-builder
-ADD setup.sh
-RUN /setup.sh
+ADD setup.sh /
+RUN bash /setup.sh
 
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
 FROM ubuntu
