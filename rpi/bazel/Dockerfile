@@ -1,8 +1,10 @@
 #
 # Builds Bazel from scratch (incl. protoc & protoc-gen-grpc-java deps).
+# Build with:
+#   docker run --rm --privileged multiarch/qemu-user-static:register --reset
+#   docker build -t rpi-raspbian-bazel .
 # 
 FROM resin/rpi-raspbian
-
 RUN apt-get update && \
   apt-get install -y build-essential git wget oracle-java8-jdk autoconf automake libtool curl make g++ unzip &&
   export BAZEL_VERSION=0.8.0 && \
@@ -42,6 +44,15 @@ RUN apt-get update && \
     export GRPC_JAVA_PLUGIN="$PWD/protoc-gen-grpc-java" && \
   popd && \
   bash ./compile.sh
+
+# https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
+FROM resin/rpi-raspbian
+WORKDIR /root/
+COPY --from=0 \
+  /usr/local/bin/protoc \
+  /bazel-src/bazel-bin/blaze \
+  /bazel-src/third_party/grpc/compiler/src/java_plugin/cpp/protoc-gen-grpc-java \
+  /usr/bin
 
 # https://github.com/bazelbuild/bazel/issues/3174
 # WARNING: /tmp/bazel_k4wE9AzC/out/external/bazel_tools/WORKSPACE:1: Workspace name in /tmp/bazel_k4wE9AzC/out/external/bazel_tools/WORKSPACE (@io_bazel) does not match the name given in the repository's definition (@bazel_tools); this will cause a build error in future versions
