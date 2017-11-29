@@ -3,6 +3,8 @@
 # Build with:
 #   docker run --rm --privileged multiarch/qemu-user-static:register --reset
 #   docker build -t rpi-raspbian-bazel .
+#
+# TODO: read https://resin.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/
 # 
 FROM resin/rpi-raspbian as bazel-builder
 RUN apt-get update && \
