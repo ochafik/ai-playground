@@ -5,6 +5,7 @@
 #   docker build -t rpi-raspbian-bazel .
 #
 # TODO: read https://resin.io/blog/building-arm-containers-on-any-x86-machine-even-dockerhub/
+# TODO: build custom image from https://hub.docker.com/r/arm32v7/debian/
 # 
 FROM resin/rpi-raspbian as bazel-builder
 RUN apt-get update && \
