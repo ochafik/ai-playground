@@ -1,6 +1,8 @@
-# Various AI papers
+[Live BoBot](https://rawgit.com/ochafik/ai-playground/master/bobot/build/index.html) (chrome speech <-> text experiment)
 
-## NLP libraries
+# AI papers
+
+## NLP
 
 - [SyntaxNet](https://github.com/tensorflow/models/tree/master/research/syntaxnet): [DRAGNN: A Transition-based Framework for Dynamically Connected Neural Networks]() ([pdf](https://arxiv.org/pdf/1703.04474.pdf)) ([my playground](https://github.com/ochafik/parsey-universal-playground))
 
