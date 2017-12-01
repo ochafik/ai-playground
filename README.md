@@ -101,9 +101,12 @@ echo "This is a test" | syntaxnet/models/parsey_universal/parsey_universal.sh /d
 
 - [Complete Tensorflow on RPi from scratch](https://github.com/ochafik/tensorflow-on-raspberry-pi)
   ([bazel](https://github.com/samjabrahams/tensorflow-on-raspberry-pi/blob/master/GUIDE.md#3-build-bazel))
-- [Build Docker images for ARM](https://blog.hypriot.com/post/setup-simple-ci-pipeline-for-arm-images/)
+- Bazel + RPi:
+  - My [ochafik/bazel](https://github.com/ochafik/bazel/tree/build-from-scratch) fork that can be built from scratch ([PR on bazelbuild/bazel](https://github.com/bazelbuild/bazel/pull/4199).
+  - My [Raspbian Bazel attempts](https://github.com/ochafik/rpi-raspbian-bazel)
+    (also used [Build Docker images for ARM](https://blog.hypriot.com/post/setup-simple-ci-pipeline-for-arm-images/))
+  - My [Rpi setup commands](https://github.com/ochafik/autopilot)
 - [Tensorflow Dockerfile](https://github.com/tensorflow/models/blob/master/research/syntaxnet/docker-devel/Dockerfile.min)
-
 - [Install docker on Raspbian](https://howchoo.com/g/nmrlzmq1ymn/how-to-install-docker-on-your-raspberry-pi)
 
 # Bazel on Raspberry Pi (Raspbian)
