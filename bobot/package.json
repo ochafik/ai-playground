@@ -1,0 +1,30 @@
+{
+  "name": "bobot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run rollup && html-inline -i index.html -o build/index.html",
+    "run": "npm run build && cd build && python -m SimpleHTTPServer",
+    "tscw": "tsc -w",
+    "serve": "lite-server",
+    "rollup": "rollup -c",
+    "rollupw": "rollup -c -w",
+    "start": "concurrently \"npm run rollupw\" \"npm run serve\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "immutable": "^3.8.2"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.0",
+    "html-inline": "^1.2.0",
+    "lite-server": "^2.3.0",
+    "rollup": "^0.52.0",
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-watch": "^4.3.1",
+    "typescript": "^2.6.1"
+  }
+}
